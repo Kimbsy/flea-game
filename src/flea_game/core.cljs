@@ -4,14 +4,16 @@
             [quil.core :as q :include-macros true]
             [quil.middleware :as m]))
 
+(def flea-count 1000)
+
 (def black [0 0 0])
 (def width 900)
 (def height 600)
 
 (defn ->flea
   []
-  (let [pos {:x (rand-int width)
-             :y (rand-int height)}]
+  (let [pos {:x (/ width 2)
+             :y (/ height 2)}]
     (merge pos
            (s/rename-keys pos {:x :px
                                :y :py})
@@ -33,7 +35,7 @@
 
 (defn setup []
   (q/frame-rate 60)
-  {:fleas (take 1000 (repeatedly ->flea))})
+  {:fleas (take flea-count (repeatedly ->flea))})
 
 (defn rand-bool
   []
@@ -41,47 +43,77 @@
     true))
 
 (defn dec-with-reset
-  "Decrement a counter if it is greater than 1, otherwise return new."
-  [new i]
-  (if (> i 1)
-    (dec i)
+  "Decrement a counter i by an amount n if it is greater than n, otherwise return new."
+  [new n i]
+  (if (> i n)
+    (- i n)
     new))
 
 (defn inc-with-reset
-  "Increment a counter if it is less than max, otherwise return new."
-  [max new i]
+  "Increment a counter i by an amount n if it is less than max, otherwise return new."
+  [max new n i]
   (if (< i max)
-    (inc i)
+    (+ i n)
     new))
 
+(defn flee-vector
+  [f]
+  {:x (- (:x f) (q/mouse-x))
+   :y (- (:y f) (q/mouse-y))})
+
+;; @TODO: this is super unclear, maybe something a bit more if-statementy
 (defn move-timers
   "Move all the timers forward, reset if necessary."
   [f]
-  (-> f
-      ;; move the delta-jump timer forward if we are jumping
-      (update :dj (if (or (= 1 (:tj f))
-                          (not= 0 (:dj f)))
-                    (partial inc-with-reset 10 0)
-                    identity))
-      ;; move the time-to-next-jump timer forward if we are not jumping
-      (update :tj (if (= 0 (:dj f))
-                    (partial dec-with-reset (u/random-jump-time))
-                    identity))))
+  ;; Figure out how quickly the flea is preparing to jump
+  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f))))]
+    (-> f
+        ;; move the delta-jump timer forward if we are jumping
+        (update :dj (if (or (= 1 (:tj f))
+                            (> tj-speed (:tj f))
+                            (not= 0 (:dj f)))
+                      (partial inc-with-reset 10 0 1)
+                      identity))
+        ;; move the time-to-next-jump timer forward if we are not jumping
+        (update :tj (if (= 0 (:dj f))
+                      (partial dec-with-reset (u/random-jump-time) tj-speed)
+                      identity)))))
+
+(defn danger-close
+  [f]
+  (and (> 50 (Math/abs (- (:x f) (q/mouse-x))))
+       (> 50 (Math/abs (- (:y f) (q/mouse-y))))))
+
+(defn calc-jump-coords
+  "The mouse is close, jump away!"
+  [f]
+  (let [v-flee (flee-vector f)
+        magnitude   (- (u/random-flee-distance) (u/length v-flee))
+        normalized  (u/normalize v-flee)]
+    {:tx (+ (:x f) (* (:x normalized) magnitude))
+     :ty (+ (:y f) (* (:y normalized) magnitude))}))
 
 (defn maybe-calc-jump-coords
+  "If we have finished our jump and are ready for a new one, check if
+  the mouse is too close and select a new target."
   [f]
-  f)
+  (if (and (= (:x f) (:px f))
+           (= (:y f) (:py f)))
+    (merge f
+           (if (danger-close f)
+             (calc-jump-coords f)
+             {:tx (u/random-target-offset (:x f))
+              :ty (u/random-target-offset (:y f))}))
+    f))
 
 (defn update-pos
   [f]
   (if (and (= (:x f) (:tx f))
            (= (:y f) (:ty f)))
-    ;; jump is done, reset previous to current, set new target.
+    ;; jump is done, reset previous to current
     (assoc f
            :px (:x f)
-           :py (:y f)
-           :tx (u/random-target-offset (:x f))
-           :ty (u/random-target-offset (:y f)))
+           :py (:y f))
     
     ;; part way through jump, calculate offset and apply to current
     (let [d (:dj f)
