@@ -2,7 +2,7 @@
 
 (defn random-jump-time
   []
-  (+ 100 (rand-int 20)))
+  (+ 150 (rand-int 50)))
 
 (defn random-target-offset
   [t]

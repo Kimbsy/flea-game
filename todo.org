@@ -1,5 +1,5 @@
 * DONE clean up status transitions
-* TODO controllable character
+* DONE controllable character
 * TODO menu screen
 * TODO boundary walls
 * TODO kill areas

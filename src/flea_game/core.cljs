@@ -1,5 +1,6 @@
 (ns flea-game.core
   (:require [clojure.set :as s]
+            [flea-game.ringmaster :as r]
             [flea-game.utils :as u]
             [quil.core :as q :include-macros true]
             [quil.middleware :as m]))
@@ -7,13 +8,14 @@
 (def flea-count 1000)
 
 (def black [0 0 0])
+(def red [255 0 0])
 (def width 900)
 (def height 600)
 
 (defn ->flea
   []
-  (let [pos {:x      (/ width 2)
-             :y      (/ height 2)
+  (let [pos {:x      (+ (/ width 2) (rand-int 100) -50)
+             :y      (+ (/ height 2) (rand-int 100) -50)
              :status :waiting}]
     (merge pos
            (s/rename-keys pos {:x :px
@@ -25,50 +27,31 @@
 
 (defn- test-flea
   []
-  {:x 100
-   :y 100
+  {:x      (/ width 2)
+   :y      (height 2)
    :status :waiting
-   :px 100
-   :py 100
-   :tx 150
-   :ty 150
-   :dj 0
-   :tj 10})
+   :px     100
+   :py     100
+   :tx     150
+   :ty     150
+   :dj     0
+   :tj     10})
 
 (defn setup []
   (q/frame-rate 60)
-  {:fleas (take flea-count (repeatedly ->flea))})
-
-(defn rand-bool
-  []
-  (when (= 0 (rand-int 2))
-    true))
-
-(defn dec-with-reset
-  "Decrement a counter i by an amount n if it is greater than n,
-  otherwise return new."
-  [new n i]
-  (if (> i n)
-    (- i n)
-    new))
-
-(defn inc-with-reset
-  "Increment a counter i by an amount n if it is less than max,
-  otherwise return new."
-  [max new n i]
-  (if (< i max)
-    (+ i n)
-    new))
+  {:fleas      (take flea-count (repeatedly ->flea))
+   :ringmaster (r/->ringmaster)
+   :held-keys  {}})
 
 (defn flee-vector
-  [f]
-  {:x (- (:x f) (q/mouse-x))
-   :y (- (:y f) (q/mouse-y))})
+  [f r]
+  {:x (- (:x f) (:x r))
+   :y (- (:y f) (:y r))})
 
 (defn update-flea-status
   "Let the flea transition between waiting, jumping and landing."
-  [f]
-  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f))))]
+  [f r]
+  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f r))))]
     (case (:status f)
       :waiting
       (if (> tj-speed (:tj f))
@@ -88,14 +71,14 @@
                    :py (:y f))))))
 
 (defn danger-close
-  [f]
-  (and (> 50 (Math/abs (- (:x f) (q/mouse-x))))
-       (> 50 (Math/abs (- (:y f) (q/mouse-y))))))
+  [f r]
+  (and (> 50 (Math/abs (- (:x f) (:x r))))
+       (> 50 (Math/abs (- (:y f) (:y r))))))
 
 (defn calc-jump-coords
   "The mouse is close, jump away!"
-  [f]
-  (let [v-flee (flee-vector f)
+  [f r]
+  (let [v-flee (flee-vector f r)
         magnitude   (- (u/random-flee-distance) (u/length v-flee))
         normalized  (u/normalize v-flee)]
     {:tx (+ (:x f) (* (:x normalized) magnitude))
@@ -104,12 +87,12 @@
 (defn maybe-calc-jump-coords
   "If we have finished our jump and are ready for a new one, check if
   the mouse is too close and select a new target."
-  [f]
+  [f r]
   (if (and (= (:x f) (:px f))
            (= (:y f) (:py f)))
     (merge f
-           (if (danger-close f)
-             (calc-jump-coords f)
+           (if (danger-close f r)
+             (calc-jump-coords f r)
              {:tx (u/random-target-offset (:x f))
               :ty (u/random-target-offset (:y f))}))
     f))
@@ -123,25 +106,58 @@
         (assoc :x (+ (:px f) dx))
         (assoc :y (+ (:py f) dy)))))
 
-(defn update-flea
- [f]
-  ((comp update-flea-status
-         maybe-calc-jump-coords
-         update-pos)
-   f))
+(defn update-fleas
+  [fleas r]
+  (map (fn [f]
+         (-> f
+             (update-flea-status r)
+             (maybe-calc-jump-coords r)
+             update-pos))
+       fleas))
+
+(defn update-ringmaster
+  [r {:keys [held-keys]}]
+  (-> r
+      (r/update-velocity held-keys)
+      (r/apply-friction)
+      (r/update-pos)))
 
 (defn update-state [state]
-  (update state :fleas #(map update-flea %)))
+  (-> state
+      (update :ringmaster #(update-ringmaster % state))
+      (update :fleas #(update-fleas % (:ringmaster state)))))
 
 (defn draw-flea
   [{:keys [x y]}]
   (q/point x y))
 
-(defn draw-state [state]
+(defn draw-state
+  [state]
   (q/background 240)
-  (apply q/fill black)
+  
+  (apply q/stroke black)
   (q/stroke-weight 2)
-  (doall (map draw-flea (:fleas state))))
+  (doall (map draw-flea (:fleas state)))
+
+  (r/draw (:ringmaster state)))
+
+(def arrow-map {:ArrowUp    :up
+                :ArrowDown  :down
+                :ArrowLeft  :left
+                :ArrowRight :right})
+
+(defn key-pressed
+  [state e]
+  (-> state
+      (assoc-in [:held-keys (:key e)] true)
+      (update-in [:ringmaster :direction]
+                 (if-let [direction (arrow-map (:key e))]
+                   (constantly direction)
+                   identity))))
+
+(defn key-released
+  [state e]
+  (assoc-in state [:held-keys (:key e)] false))
 
 (defn ^:export run-sketch []
   (q/defsketch flea-game
@@ -150,6 +166,8 @@
     :setup setup
     :update update-state
     :draw draw-state
+    :key-pressed key-pressed
+    :key-released key-released
     :middleware [m/fun-mode]))
 
 (run-sketch)
