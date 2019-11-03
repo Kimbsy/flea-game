@@ -12,8 +12,9 @@
 
 (defn ->flea
   []
-  (let [pos {:x (/ width 2)
-             :y (/ height 2)}]
+  (let [pos {:x      (/ width 2)
+             :y      (/ height 2)
+             :status :waiting}]
     (merge pos
            (s/rename-keys pos {:x :px
                                :y :py})
@@ -26,6 +27,7 @@
   []
   {:x 100
    :y 100
+   :status :waiting
    :px 100
    :py 100
    :tx 150
@@ -43,14 +45,16 @@
     true))
 
 (defn dec-with-reset
-  "Decrement a counter i by an amount n if it is greater than n, otherwise return new."
+  "Decrement a counter i by an amount n if it is greater than n,
+  otherwise return new."
   [new n i]
   (if (> i n)
     (- i n)
     new))
 
 (defn inc-with-reset
-  "Increment a counter i by an amount n if it is less than max, otherwise return new."
+  "Increment a counter i by an amount n if it is less than max,
+  otherwise return new."
   [max new n i]
   (if (< i max)
     (+ i n)
@@ -61,23 +65,27 @@
   {:x (- (:x f) (q/mouse-x))
    :y (- (:y f) (q/mouse-y))})
 
-;; @TODO: this is super unclear, maybe something a bit more if-statementy
-(defn move-timers
-  "Move all the timers forward, reset if necessary."
+(defn update-flea-status
+  "Let the flea transition between waiting, jumping and landing."
   [f]
-  ;; Figure out how quickly the flea is preparing to jump
   (let [tj-speed (max 1 (- 50 (u/length (flee-vector f))))]
-    (-> f
-        ;; move the delta-jump timer forward if we are jumping
-        (update :dj (if (or (= 1 (:tj f))
-                            (> tj-speed (:tj f))
-                            (not= 0 (:dj f)))
-                      (partial inc-with-reset 10 0 1)
-                      identity))
-        ;; move the time-to-next-jump timer forward if we are not jumping
-        (update :tj (if (= 0 (:dj f))
-                      (partial dec-with-reset (u/random-jump-time) tj-speed)
-                      identity)))))
+    (case (:status f)
+      :waiting
+      (if (> tj-speed (:tj f))
+        (assoc f :status :jumping)
+        (update f :tj #(- % tj-speed)))
+
+      :jumping
+      (if (< 10 (:dj f))
+        (assoc f :status :landing)
+        (update f :dj inc))
+
+      :landing
+      (-> f (assoc :status :waiting
+                   :dj 0
+                   :tj (u/random-jump-time)
+                   :px (:x f)
+                   :py (:y f))))))
 
 (defn danger-close
   [f]
@@ -108,24 +116,16 @@
 
 (defn update-pos
   [f]
-  (if (and (= (:x f) (:tx f))
-           (= (:y f) (:ty f)))
-    ;; jump is done, reset previous to current
-    (assoc f
-           :px (:x f)
-           :py (:y f))
-    
-    ;; part way through jump, calculate offset and apply to current
-    (let [d (:dj f)
-          dx (* d (/ (- (:tx f) (:px f)) 10))
-          dy (* d (/ (- (:ty f) (:py f)) 10))]
-      (-> f
-          (assoc :x (+ (:px f) dx))
-          (assoc :y (+ (:py f) dy))))))
+  (let [d (:dj f)
+        dx (* d (/ (- (:tx f) (:px f)) 10))
+        dy (* d (/ (- (:ty f) (:py f)) 10))]
+    (-> f
+        (assoc :x (+ (:px f) dx))
+        (assoc :y (+ (:py f) dy)))))
 
 (defn update-flea
  [f]
-  ((comp move-timers
+  ((comp update-flea-status
          maybe-calc-jump-coords
          update-pos)
    f))
