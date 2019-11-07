@@ -1,14 +1,14 @@
 (ns flea-game.core
   (:require [clojure.set :as s]
+            [flea-game.screens.level-1 :as level-1]
+            [flea-game.screens.level-2 :as level-2]
+            [flea-game.screens.menu :as menu]
             [flea-game.ringmaster :as r]
             [flea-game.utils :as u]
             [quil.core :as q :include-macros true]
             [quil.middleware :as m]))
 
 (def flea-count 1000)
-
-(def black [0 0 0])
-(def red [255 0 0])
 (def width 900)
 (def height 600)
 
@@ -41,133 +41,45 @@
   (q/frame-rate 60)
   {:fleas      (take flea-count (repeatedly ->flea))
    :ringmaster (r/->ringmaster)
-   :held-keys  {}})
+   :held-keys  {}
+   :screen     :level-1})
 
-(defn flee-vector
-  [f r]
-  {:x (- (:x f) (:x r))
-   :y (- (:y f) (:y r))})
+(defn screen-update-state [state]
+  (case (:screen state)
+    :menu    (menu/update-state state)
+    :level-1 (level-1/update-state state)
+    :level-2 (level-2/update-state state)))
 
-(defn update-flea-status
-  "Let the flea transition between waiting, jumping and landing."
-  [f r]
-  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f r))))]
-    (case (:status f)
-      :waiting
-      (if (> tj-speed (:tj f))
-        (assoc f :status :jumping)
-        (update f :tj #(- % tj-speed)))
-
-      :jumping
-      (if (< 10 (:dj f))
-        (assoc f :status :landing)
-        (update f :dj inc))
-
-      :landing
-      (-> f (assoc :status :waiting
-                   :dj 0
-                   :tj (u/random-jump-time)
-                   :px (:x f)
-                   :py (:y f))))))
-
-(defn danger-close
-  [f r]
-  (and (> 50 (Math/abs (- (:x f) (:x r))))
-       (> 50 (Math/abs (- (:y f) (:y r))))))
-
-(defn calc-jump-coords
-  "The mouse is close, jump away!"
-  [f r]
-  (let [v-flee (flee-vector f r)
-        magnitude   (- (u/random-flee-distance) (u/length v-flee))
-        normalized  (u/normalize v-flee)]
-    {:tx (+ (:x f) (* (:x normalized) magnitude))
-     :ty (+ (:y f) (* (:y normalized) magnitude))}))
-
-(defn maybe-calc-jump-coords
-  "If we have finished our jump and are ready for a new one, check if
-  the mouse is too close and select a new target."
-  [f r]
-  (if (and (= (:x f) (:px f))
-           (= (:y f) (:py f)))
-    (merge f
-           (if (danger-close f r)
-             (calc-jump-coords f r)
-             {:tx (u/random-target-offset (:x f))
-              :ty (u/random-target-offset (:y f))}))
-    f))
-
-(defn update-pos
-  [f]
-  (let [d (:dj f)
-        dx (* d (/ (- (:tx f) (:px f)) 10))
-        dy (* d (/ (- (:ty f) (:py f)) 10))]
-    (-> f
-        (assoc :x (+ (:px f) dx))
-        (assoc :y (+ (:py f) dy)))))
-
-(defn update-fleas
-  [fleas r]
-  (map (fn [f]
-         (-> f
-             (update-flea-status r)
-             (maybe-calc-jump-coords r)
-             update-pos))
-       fleas))
-
-(defn update-ringmaster
-  [r {:keys [held-keys]}]
-  (-> r
-      (r/update-velocity held-keys)
-      (r/apply-friction)
-      (r/update-pos)))
-
-(defn update-state [state]
-  (-> state
-      (update :ringmaster #(update-ringmaster % state))
-      (update :fleas #(update-fleas % (:ringmaster state)))))
-
-(defn draw-flea
-  [{:keys [x y]}]
-  (q/point x y))
-
-(defn draw-state
+(defn screen-draw
   [state]
-  (q/background 240)
-  
-  (apply q/stroke black)
-  (q/stroke-weight 2)
-  (doall (map draw-flea (:fleas state)))
+  (case (:screen state)
+    :menu    (menu/draw state)
+    :level-1 (level-1/draw state)
+    :level-2 (level-2/draw state)))
 
-  (r/draw (:ringmaster state)))
-
-(def arrow-map {:ArrowUp    :up
-                :ArrowDown  :down
-                :ArrowLeft  :left
-                :ArrowRight :right})
-
-(defn key-pressed
+(defn screen-key-pressed
   [state e]
-  (-> state
-      (assoc-in [:held-keys (:key e)] true)
-      (update-in [:ringmaster :direction]
-                 (if-let [direction (arrow-map (:key e))]
-                   (constantly direction)
-                   identity))))
+  (case (:screen state)
+    :menu    (menu/key-pressed state e)
+    :level-1 (level-1/key-pressed state e)
+    :level-2 (level-2/key-pressed state e)))
 
-(defn key-released
+(defn screen-key-released
   [state e]
-  (assoc-in state [:held-keys (:key e)] false))
+  (case (:screen state)
+    :menu    (menu/key-released state e)
+    :level-1 (level-1/key-released state e)
+    :level-2 (level-2/key-released state e)))
 
 (defn ^:export run-sketch []
   (q/defsketch flea-game
     :host "flea-game"
     :size [width height]
     :setup setup
-    :update update-state
-    :draw draw-state
-    :key-pressed key-pressed
-    :key-released key-released
+    :update screen-update-state
+    :draw screen-draw
+    :key-pressed screen-key-pressed
+    :key-released screen-key-released
     :middleware [m/fun-mode]))
 
 (run-sketch)

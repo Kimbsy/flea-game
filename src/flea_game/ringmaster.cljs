@@ -59,6 +59,13 @@
   [{:keys [direction] :as r}]
   ((direction-map direction) r))
 
+(defn update-ringmaster
+  [r {:keys [held-keys]}]
+  (-> r
+      (update-velocity held-keys)
+      (apply-friction)
+      (update-pos)))
+
 (defn update-velocity
   [r {:keys [ArrowUp ArrowDown ArrowLeft ArrowRight]}]
   (-> r
@@ -70,8 +77,8 @@
 (defn apply-friction
   [r]
   (-> r
-      (update :vx #(* % 0.9))
-      (update :vy #(* % 0.9))))
+      (update :vx #(float (* % 0.9)))
+      (update :vy #(float (* % 0.9)))))
 
 (defn update-pos
   [{:keys [vx vy] :as r}]

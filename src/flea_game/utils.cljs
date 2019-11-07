@@ -1,5 +1,13 @@
 (ns flea-game.utils)
 
+(def black [0 0 0])
+(def red [255 0 0])
+
+(def arrow-map {:ArrowUp    :up
+                :ArrowDown  :down
+                :ArrowLeft  :left
+                :ArrowRight :right})
+
 (defn random-jump-time
   []
   (+ 150 (rand-int 50)))
