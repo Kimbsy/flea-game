@@ -1,10 +1,9 @@
 (ns flea-game.core
-  (:require [clojure.set :as s]
-            [flea-game.screens.level-1 :as level-1]
+  (:require [flea-game.screens.level-1 :as level-1]
             [flea-game.screens.level-2 :as level-2]
             [flea-game.screens.menu :as menu]
+            [flea-game.flea :as f]
             [flea-game.ringmaster :as r]
-            [flea-game.utils :as u]
             [quil.core :as q :include-macros true]
             [quil.middleware :as m]))
 
@@ -12,37 +11,15 @@
 (def width 900)
 (def height 600)
 
-(defn ->flea
-  []
-  (let [pos {:x      (+ (/ width 2) (rand-int 100) -50)
-             :y      (+ (/ height 2) (rand-int 100) -50)
-             :status :waiting}]
-    (merge pos
-           (s/rename-keys pos {:x :px
-                               :y :py})
-           {:tx (u/random-target-offset (:x pos))
-            :ty (u/random-target-offset (:y pos))}
-           {:dj 0
-            :tj (u/random-jump-time)})))
-
-(defn- test-flea
-  []
-  {:x      (/ width 2)
-   :y      (height 2)
-   :status :waiting
-   :px     100
-   :py     100
-   :tx     150
-   :ty     150
-   :dj     0
-   :tj     10})
-
 (defn setup []
   (q/frame-rate 60)
-  {:fleas      (take flea-count (repeatedly ->flea))
-   :ringmaster (r/->ringmaster)
-   :held-keys  {}
-   :screen     :level-1})
+  {:fleas        (take flea-count (repeatedly #(f/->flea width height)))
+   :ringmaster   (r/->ringmaster)
+   :held-keys    {}
+   :game-running false
+   :screen       :level-1
+   :screen-size  {:w width
+                  :h height}})
 
 (defn screen-update-state [state]
   (case (:screen state)
@@ -70,6 +47,20 @@
     :menu    (menu/key-released state e)
     :level-1 (level-1/key-released state e)
     :level-2 (level-2/key-released state e)))
+
+(defn screen-mouse-pressed
+  [state e]
+  (case (:screen state)
+    :menu    (menu/mouse-pressed state e)
+    :level-1 (level-1/mouse-pressed state e)
+    :level-2 (level-2/mouse-pressed state e)))
+
+(defn screen-mouse-released
+  [state e]
+  (case (:screen state)
+    :menu    (menu/mouse-released state e)
+    :level-1 (level-1/mouse-released state e)
+    :level-2 (level-2/mouse-released state e)))
 
 (defn ^:export run-sketch []
   (q/defsketch flea-game

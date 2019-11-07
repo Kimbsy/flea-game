@@ -1,6 +1,32 @@
 (ns flea-game.flea
-  (:require [flea-game.utils :as u]
+  (:require [clojure.set :as s]
+            [flea-game.utils :as u]
             [quil.core :as q :include-macros true]))
+
+(defn ->flea
+  [screen-width screen-height]
+  (let [pos {:x      (+ (/ screen-width 2) (rand-int 100) -50)
+             :y      (+ (/ screen-height 2) (rand-int 100) -50)
+             :status :waiting}]
+    (merge pos
+           (s/rename-keys pos {:x :px
+                               :y :py})
+           {:tx (u/random-target-offset (:x pos))
+            :ty (u/random-target-offset (:y pos))}
+           {:dj 0
+            :tj (u/random-jump-time)})))
+
+#_(defn- test-flea
+  []
+  {:x      (/ width 2)
+   :y      (height 2)
+   :status :waiting
+   :px     100
+   :py     100
+   :tx     150
+   :ty     150
+   :dj     0
+   :tj     10})
 
 (defn draw-flea
   [{:keys [x y]}]

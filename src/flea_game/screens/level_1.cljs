@@ -12,7 +12,7 @@
 
 (defn draw
   [state]
-  (q/background 240)
+  (q/background 230)
 
   (apply q/stroke u/black)
   (q/stroke-weight 2)
@@ -22,13 +22,26 @@
 
 (defn key-pressed
   [state e]
-  (-> state
-      (assoc-in [:held-keys (:key e)] true)
-      (update-in [:ringmaster :direction]
-                 (if-let [direction (u/arrow-map (:key e))]
-                   (constantly direction)
-                   identity))))
+  (if (= :Escape (:key e))
+      (-> state
+          (assoc :screen :menu)
+          (assoc :game-running true)
+          (assoc :held-keys {}))
+      (-> state
+          (assoc-in [:held-keys (:key e)] true)
+          (update-in [:ringmaster :direction]
+                     (if-let [direction (u/arrow-map (:key e))]
+                       (constantly direction)
+                       identity)))))
 
 (defn key-released
   [state e]
   (assoc-in state [:held-keys (:key e)] false))
+
+(defn mouse-pressed
+  [state e]
+  state)
+
+(defn mouse-released
+  [state e]
+  state)

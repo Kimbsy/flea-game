@@ -1,7 +1,10 @@
 (ns flea-game.utils)
 
 (def black [0 0 0])
+(def white [255 255 255])
 (def red [255 0 0])
+(def light-grey [200 200 200])
+(def dark-grey [100 100 100])
 
 (def arrow-map {:ArrowUp    :up
                 :ArrowDown  :down
