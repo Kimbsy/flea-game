@@ -1,7 +1,7 @@
 (ns flea-game.flea
   (:require [clojure.set :as s]
             [flea-game.utils :as u]
-            [quil.core :as q :include-macros true]))
+            [quil.core :as q]))
 
 (defn ->flea
   [screen-width screen-height]
@@ -32,41 +32,10 @@
   [{:keys [x y]}]
   (q/point x y))
 
-(defn update-all
-  [fleas r]
-  (map (fn [f]
-         (-> f
-             (update-flea-status r)
-             (maybe-calc-jump-coords r)
-             update-pos))
-       fleas))
-
 (defn flee-vector
   [f r]
   {:x (- (:x f) (:x r))
    :y (- (:y f) (:y r))})
-
-(defn update-flea-status
-  "Let the flea transition between waiting, jumping and landing."
-  [f r]
-  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f r))))]
-    (case (:status f)
-      :waiting
-      (if (> tj-speed (:tj f))
-        (assoc f :status :jumping)
-        (update f :tj #(- % tj-speed)))
-
-      :jumping
-      (if (< 10 (:dj f))
-        (assoc f :status :landing)
-        (update f :dj inc))
-
-      :landing
-      (-> f (assoc :status :waiting
-                   :dj 0
-                   :tj (u/random-jump-time)
-                   :px (:x f)
-                   :py (:y f))))))
 
 (defn danger-close
   [f r]
@@ -103,3 +72,34 @@
     (-> f
         (assoc :x (+ (:px f) dx))
         (assoc :y (+ (:py f) dy)))))
+
+(defn update-flea-status
+  "Let the flea transition between waiting, jumping and landing."
+  [f r]
+  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f r))))]
+    (case (:status f)
+      :waiting
+      (if (> tj-speed (:tj f))
+        (assoc f :status :jumping)
+        (update f :tj #(- % tj-speed)))
+
+      :jumping
+      (if (< 10 (:dj f))
+        (assoc f :status :landing)
+        (update f :dj inc))
+
+      :landing
+      (-> f (assoc :status :waiting
+                   :dj 0
+                   :tj (u/random-jump-time)
+                   :px (:x f)
+                   :py (:y f))))))
+
+(defn update-all
+  [fleas r]
+  (map (fn [f]
+         (-> f
+             (update-flea-status r)
+             (maybe-calc-jump-coords r)
+             update-pos))
+       fleas))

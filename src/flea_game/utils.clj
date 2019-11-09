@@ -6,11 +6,6 @@
 (def light-grey [200 200 200])
 (def dark-grey [100 100 100])
 
-(def arrow-map {:ArrowUp    :up
-                :ArrowDown  :down
-                :ArrowLeft  :left
-                :ArrowRight :right})
-
 (defn random-jump-time
   []
   (+ 150 (rand-int 50)))

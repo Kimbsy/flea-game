@@ -2,7 +2,7 @@
   (:require [flea-game.utils :as u]
             [flea-game.flea :as f]
             [flea-game.ringmaster :as r]
-            [quil.core :as q :include-macros true]))
+            [quil.core :as q]))
 
 (defn update-state
   [state]
@@ -22,6 +22,7 @@
 
 (defn key-pressed
   [state e]
+  (prn e)
   (if (= :Escape (:key e))
       (-> state
           (assoc :screen :menu)
@@ -30,8 +31,8 @@
       (-> state
           (assoc-in [:held-keys (:key e)] true)
           (update-in [:ringmaster :direction]
-                     (if-let [direction (u/arrow-map (:key e))]
-                       (constantly direction)
+                     (if (#{:up :down :left :right} (:key e))
+                       (constantly (:key e))
                        identity)))))
 
 (defn key-released

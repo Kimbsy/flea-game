@@ -1,5 +1,5 @@
 (ns flea-game.screens.level-2
-  (:require [quil.core :as q :include-macros true]))
+  (:require [quil.core :as q]))
 
 (defn update-state
   [state]

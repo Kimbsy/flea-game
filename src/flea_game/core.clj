@@ -4,7 +4,7 @@
             [flea-game.screens.menu :as menu]
             [flea-game.flea :as f]
             [flea-game.ringmaster :as r]
-            [quil.core :as q :include-macros true]
+            [quil.core :as q]
             [quil.middleware :as m]))
 
 (def flea-count 1000)
@@ -62,17 +62,14 @@
     :level-1 (level-1/mouse-released state e)
     :level-2 (level-2/mouse-released state e)))
 
-(defn ^:export run-sketch []
-  (q/defsketch flea-game
-    :host "flea-game"
-    :size [width height]
-    :setup setup
-    :update screen-update-state
-    :draw screen-draw
-    :key-pressed screen-key-pressed
-    :key-released screen-key-released
-    :mouse-pressed screen-mouse-pressed
-    :mouse-released screen-mouse-released
-    :middleware [m/fun-mode]))
-
-(run-sketch)
+(q/defsketch flea-game
+  :host "flea-game"
+  :size [width height]
+  :setup setup
+  :update screen-update-state
+  :draw screen-draw
+  :key-pressed screen-key-pressed
+  :key-released screen-key-released
+  :mouse-pressed screen-mouse-pressed
+  :mouse-released screen-mouse-released
+  :middleware [m/fun-mode])

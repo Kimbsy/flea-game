@@ -1,5 +1,5 @@
 (ns flea-game.ringmaster
-  (:require [quil.core :as q :include-macros true]))
+  (:require [quil.core :as q]))
 
 (def colors {:r [255 0 0]
              :b [0 0 0]})
@@ -59,20 +59,13 @@
   [{:keys [direction] :as r}]
   ((direction-map direction) r))
 
-(defn update-ringmaster
-  [r {:keys [held-keys]}]
-  (-> r
-      (update-velocity held-keys)
-      (apply-friction)
-      (update-pos)))
-
 (defn update-velocity
-  [r {:keys [ArrowUp ArrowDown ArrowLeft ArrowRight]}]
+  [r {:keys [up down left right]}]
   (-> r
-      (update :vy (if ArrowUp #(- % acceleration) identity))
-      (update :vy (if ArrowDown #(+ % acceleration) identity))
-      (update :vx (if ArrowLeft #(- % acceleration) identity))
-      (update :vx (if ArrowRight #(+ % acceleration) identity))))
+      (update :vy (if up #(- % acceleration) identity))
+      (update :vy (if down #(+ % acceleration) identity))
+      (update :vx (if left #(- % acceleration) identity))
+      (update :vx (if right #(+ % acceleration) identity))))
 
 (defn apply-friction
   [r]
@@ -85,3 +78,10 @@
   (-> r
       (update :x #(+ % vx))
       (update :y #(+ % vy))))
+
+(defn update-ringmaster
+  [r {:keys [held-keys]}]
+  (-> r
+      (update-velocity held-keys)
+      (apply-friction)
+      (update-pos)))
