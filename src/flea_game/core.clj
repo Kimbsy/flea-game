@@ -1,9 +1,11 @@
 (ns flea-game.core
-  (:require [flea-game.screens.level-1 :as level-1]
+  (:gen-class)
+  (:require [flea-game.flea :as f]
+            [flea-game.music :as music]
+            [flea-game.ringmaster :as r]
+            [flea-game.screens.level-1 :as level-1]
             [flea-game.screens.level-2 :as level-2]
             [flea-game.screens.menu :as menu]
-            [flea-game.flea :as f]
-            [flea-game.ringmaster :as r]
             [quil.core :as q]
             [quil.middleware :as m]))
 
@@ -13,6 +15,7 @@
 
 (defn setup []
   (q/frame-rate 60)
+  (music/init)
   {:fleas        (take flea-count (repeatedly #(f/->flea width height)))
    :ringmaster   (r/->ringmaster)
    :held-keys    {}

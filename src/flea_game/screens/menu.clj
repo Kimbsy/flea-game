@@ -1,21 +1,22 @@
 (ns flea-game.screens.menu
-  (:require [flea-game.utils :as u]
+  (:require [flea-game.music :as music]
+            [flea-game.utils :as u]
             [quil.core :as q]))
 
 (defn play-game
   [state]
+  (music/switch-track :level-1)
   (-> state
         (assoc :screen :level-1)))
 
 (defn options
   [state]
-  (prn "options")
   state)
 
 (defn exit
   [state]
-  (prn "exit")
-  state)
+  (music/stop)
+  (q/exit))
 
 (def default-buttons [{:text        "START"
                        :handler     play-game
@@ -107,6 +108,7 @@
 
 (defn key-pressed
   [state e]
+  (music/play-sound-effect :whip-1)
   state)
 
 (defn key-released

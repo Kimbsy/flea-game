@@ -1,7 +1,8 @@
 (ns flea-game.screens.level-1
-  (:require [flea-game.utils :as u]
-            [flea-game.flea :as f]
+  (:require [flea-game.flea :as f]
+            [flea-game.music :as music]
             [flea-game.ringmaster :as r]
+            [flea-game.utils :as u]
             [quil.core :as q]))
 
 (defn update-state
@@ -22,12 +23,12 @@
 
 (defn key-pressed
   [state e]
-  (prn e)
-  (if (= :Escape (:key e))
-      (-> state
-          (assoc :screen :menu)
-          (assoc :game-running true)
-          (assoc :held-keys {}))
+  (if (= 10 (:key-code e)) ;; enter
+    (do (music/switch-track :title)
+        (-> state
+            (assoc :screen :menu)
+            (assoc :game-running true)
+            (assoc :held-keys {})))
       (-> state
           (assoc-in [:held-keys (:key e)] true)
           (update-in [:ringmaster :direction]
