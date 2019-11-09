@@ -1,6 +1,13 @@
 * DONE clean up status transitions
 * DONE controllable character
-* TODO menu screen
+* DONE menu screen
+* TODO clickable buttons
+* TODO add click whip, wasd movement
 * TODO boundary walls
-* TODO kill areas
 * TODO scoring areas
+* TODO kill areas
+* TODO design some levels
+* TODO music
+* TODO sepia-tone palette
+* TODO 8mm film flicker
+* TODO title cards

@@ -17,7 +17,7 @@
    :ringmaster   (r/->ringmaster)
    :held-keys    {}
    :game-running false
-   :screen       :level-1
+   :screen       :menu
    :screen-size  {:w width
                   :h height}})
 
