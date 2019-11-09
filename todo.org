@@ -1,7 +1,7 @@
 * DONE clean up status transitions
 * DONE controllable character
 * DONE menu screen
-* TODO clickable buttons
+* DONE clickable buttons
 * TODO add click whip, wasd movement
 * TODO boundary walls
 * TODO scoring areas

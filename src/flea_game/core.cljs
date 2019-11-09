@@ -71,6 +71,8 @@
     :draw screen-draw
     :key-pressed screen-key-pressed
     :key-released screen-key-released
+    :mouse-pressed screen-mouse-pressed
+    :mouse-released screen-mouse-released
     :middleware [m/fun-mode]))
 
 (run-sketch)

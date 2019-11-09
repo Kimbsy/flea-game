@@ -2,42 +2,102 @@
   (:require [flea-game.utils :as u]
             [quil.core :as q :include-macros true]))
 
-(def default-buttons [{:text "START"}
-                      {:text "OPTIONS"}
-                      {:text "EXIT"}])
+(defn play-game
+  [state]
+  (-> state
+        (assoc :screen :level-1)))
 
-(def running-buttons [{:text "CONTINUE"}
-                      {:text "OPTIONS"}
-                      {:text "EXIT"}])
+(defn options
+  [state]
+  (prn "options")
+  state)
+
+(defn exit
+  [state]
+  (prn "exit")
+  state)
+
+(def default-buttons [{:text        "START"
+                       :handler     play-game
+                       :is-pressed? false}
+                      {:text        "OPTIONS"
+                       :handler     options
+                       :is-pressed? false}
+                      {:text        "EXIT"
+                       :handler     exit
+                       :is-pressed? false}])
 
 (defn update-state
   [state]
   state)
 
-(defn get-y
+(defn button-get-x
+  [w]
+  (/ w 3))
+
+(defn button-get-y
   [i h n]
   (+ (* 2 (/ h 5)) (* i (/ (* 2 (/ h 3)) (inc n)))))
 
+(defn button-get-w
+  [w]
+  (/ w 3))
+
+(defn button-get-h
+  [h]
+  (/ h 10))
+
+(defn button-offset
+  [state i]
+  (if (= i (:held-button state))
+    3
+    0))
+
+(defn get-bounds
+  [i w h n]
+  {:x (button-get-x w)
+   :y (button-get-y i h n)
+   :w (button-get-w w)
+   :h (button-get-h h)})
+
+(defn inside
+  [e bounds]
+  (and (<= (:x bounds) (:x e) (+ (:x bounds) (:w bounds)))
+       (<= (:y bounds) (:y e) (+ (:y bounds) (:h bounds)))))
+
 (defn draw-button
-  [{{:keys [w h]} :screen-size} n i {:keys [text]}]
+  [{{:keys [w h]} :screen-size :as state} n i {:keys [text] :as b}]
   (apply q/fill u/black)
-  (q/rect (+ 3 (/ w 3)) (+ 3 (get-y i h n)) (/ w 3) (/ h 10))
+  (q/rect (+ 3 (button-get-x w))
+          (+ 3 (button-get-y i h n))
+          (button-get-w w)
+          (button-get-h h))
+
   (apply q/fill u/dark-grey)
-  (q/rect (/ w 3) (get-y i h n) (/ w 3) (/ h 10))
+  (q/rect (+ (button-get-x w)
+             (button-offset state i))
+          (+ (button-get-y i h n)
+             (button-offset state i))
+          (button-get-w w)
+          (button-get-h h))
   (apply q/fill u/white)
-  (q/text text (/ w 2) (+ (get-y i h n) (/ h 20))))
+  (q/text text
+          (+ (/ w 2)
+             (button-offset state i))
+          (+ (+ (button-get-y i h n) (/ h 20))
+             (button-offset state i))))
 
 (defn draw
   [{{:keys [w h]} :screen-size :as state}]
   (let [buttons (if (:game-running state)
-                  running-buttons
+                  (assoc-in default-buttons [0 :text] "CONTINUE")
                   default-buttons)]
     (q/background 230)
 
     (apply q/fill u/dark-grey)
     (q/text-align :center :center)
     (q/text-font "serif" 50)
-    (q/text "Flea Herding Simulator 2019" (/ w 2) (/ h 6))
+    (q/text "Working Title Flea Game" (/ w 2) (/ h 6))
 
     (q/text-font "monospace" 30)
     (q/no-stroke)
@@ -47,22 +107,28 @@
 
 (defn key-pressed
   [state e]
-  ;; @TODO temp way of getting back into the game
-  (if (= :Enter (:key e))
-    (-> state
-        (assoc :screen :level-1))
-    state))
+  state)
 
 (defn key-released
   [state e]
   state)
 
-;; @TODO: clicking on buttons, need bounding functions and onclick
-;; handlers
 (defn mouse-pressed
-  [state e]
-  state)
+  [{{:keys [w h]} :screen-size :as state} e]
+  (let [n (count default-buttons)]
+    (doall
+     (reduce (fn [state [i b]]
+               (if (inside e (get-bounds i w h n))
+                 (assoc state :held-button i)
+                 state))
+             state
+             (zipmap (range)
+                     default-buttons)))))
 
 (defn mouse-released
   [state e]
-  state)
+  (if-let [i (:held-button state)]
+      (let [held-button (nth default-buttons (:held-button state))]
+        (-> ((:handler held-button) state)
+            (dissoc :held-button)))
+      state))
