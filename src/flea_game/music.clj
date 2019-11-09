@@ -2,12 +2,7 @@
   (:require [clj-audio.core :as c]
             [clj-audio.sampled :as s]
             [clojure.java.io :as io])
-  (:import [javax.sound.sampled
-            AudioInputStream
-            AudioSystem
-            Clip
-            SourceDataLine
-            TargetDataLine]))
+  (:import javax.sound.sampled.SourceDataLine))
 
 ;;;;;;;;;;
 ;;;; Needed to duplicate some of the clj-audio lib so I can have sound

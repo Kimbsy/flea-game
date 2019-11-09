@@ -1,5 +1,4 @@
 (ns flea-game.core
-  (:gen-class)
   (:require [flea-game.flea :as f]
             [flea-game.music :as music]
             [flea-game.ringmaster :as r]
@@ -7,7 +6,8 @@
             [flea-game.screens.level-2 :as level-2]
             [flea-game.screens.menu :as menu]
             [quil.core :as q]
-            [quil.middleware :as m]))
+            [quil.middleware :as m])
+  (:gen-class))
 
 (def flea-count 1000)
 (def width 900)
@@ -65,14 +65,16 @@
     :level-1 (level-1/mouse-released state e)
     :level-2 (level-2/mouse-released state e)))
 
-(q/defsketch flea-game
-  :host "flea-game"
-  :size [width height]
-  :setup setup
-  :update screen-update-state
-  :draw screen-draw
-  :key-pressed screen-key-pressed
-  :key-released screen-key-released
-  :mouse-pressed screen-mouse-pressed
-  :mouse-released screen-mouse-released
-  :middleware [m/fun-mode])
+(defn -main
+  [& args]
+  (q/sketch
+   :host "flea-game"
+   :size [width height]
+   :setup setup
+   :update screen-update-state
+   :draw screen-draw
+   :key-pressed screen-key-pressed
+   :key-released screen-key-released
+   :mouse-pressed screen-mouse-pressed
+   :mouse-released screen-mouse-released
+   :middleware [m/fun-mode]))
