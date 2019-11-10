@@ -61,11 +61,6 @@
    :w (button-get-w w)
    :h (button-get-h h)})
 
-(defn inside
-  [e bounds]
-  (and (<= (:x bounds) (:x e) (+ (:x bounds) (:w bounds)))
-       (<= (:y bounds) (:y e) (+ (:y bounds) (:h bounds)))))
-
 (defn draw-button
   [{{:keys [w h]} :screen-size :as state} n i {:keys [text] :as b}]
   (apply q/fill u/black)
@@ -120,7 +115,7 @@
   (let [n (count default-buttons)]
     (doall
      (reduce (fn [state [i b]]
-               (if (inside e (get-bounds i w h n))
+               (if (u/inside e (get-bounds i w h n))
                  (assoc state :held-button i)
                  state))
              state

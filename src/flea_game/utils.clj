@@ -6,6 +6,11 @@
 (def light-grey [200 200 200])
 (def dark-grey [100 100 100])
 
+(def wasd-map {:w :up
+               :s :down
+               :a :left
+               :d :right})
+
 (defn random-jump-time
   []
   (+ 150 (rand-int 50)))
@@ -29,3 +34,8 @@
   (let [length (length vector)]
     {:x (* (/ 1 length) (:x vector))
      :y (* (/ 1 length) (:y vector))}))
+
+(defn inside
+  [pos bounds]
+  (and (<= (:x bounds) (:x pos) (+ (:x bounds) (:w bounds)))
+       (<= (:y bounds) (:y pos) (+ (:y bounds) (:h bounds)))))

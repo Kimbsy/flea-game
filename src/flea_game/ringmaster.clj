@@ -60,12 +60,12 @@
   ((direction-map direction) r))
 
 (defn update-velocity
-  [r {:keys [up down left right]}]
+  [r {:keys [w a s d]}]
   (-> r
-      (update :vy (if up #(- % acceleration) identity))
-      (update :vy (if down #(+ % acceleration) identity))
-      (update :vx (if left #(- % acceleration) identity))
-      (update :vx (if right #(+ % acceleration) identity))))
+      (update :vy (if w #(- % acceleration) identity))
+      (update :vy (if s #(+ % acceleration) identity))
+      (update :vx (if a #(- % acceleration) identity))
+      (update :vx (if d #(+ % acceleration) identity))))
 
 (defn apply-friction
   [r]
