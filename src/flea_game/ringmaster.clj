@@ -9,7 +9,7 @@
               [:r :r :r]])
 
 (def size 5)
-(def acceleration 1)
+(def acceleration 0.6)
 
 (defn ->ringmaster
   []

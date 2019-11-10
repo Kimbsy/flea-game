@@ -16,8 +16,7 @@
 (defn exit
   [state]
   (music/stop)
-  (q/exit)
-  (System/exit 0))
+  (q/exit))
 
 (def default-buttons [{:text        "START"
                        :handler     play-game

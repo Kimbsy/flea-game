@@ -16,18 +16,6 @@
            {:dj 0
             :tj (u/random-jump-time)})))
 
-#_(defn- test-flea
-  []
-  {:x      (/ width 2)
-   :y      (height 2)
-   :status :waiting
-   :px     100
-   :py     100
-   :tx     150
-   :ty     150
-   :dj     0
-   :tj     10})
-
 (defn draw-flea
   [{:keys [x y]}]
   (q/point x y))
@@ -39,8 +27,8 @@
 
 (defn danger-close
   [f r]
-  (and (> 50 (Math/abs (- (:x f) (:x r))))
-       (> 50 (Math/abs (- (:y f) (:y r))))))
+  (and (> 70 (Math/abs (- (:x f) (:x r))))
+       (> 70 (Math/abs (- (:y f) (:y r))))))
 
 (defn calc-jump-coords
   "The mouse is close, jump away!"
@@ -76,7 +64,7 @@
 (defn update-flea-status
   "Let the flea transition between waiting, jumping and landing."
   [f r]
-  (let [tj-speed (max 1 (- 50 (u/length (flee-vector f r))))]
+  (let [tj-speed (max 1 (- 70 (u/length (flee-vector f r))))]
     (case (:status f)
       :waiting
       (if (> tj-speed (:tj f))

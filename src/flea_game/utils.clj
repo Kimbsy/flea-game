@@ -12,7 +12,7 @@
 
 (defn random-target-offset
   [t]
-  (+ t (rand-int 50) -25))
+  (+ t (rand-int 50) -15))
 
 (defn random-flee-distance
   []
