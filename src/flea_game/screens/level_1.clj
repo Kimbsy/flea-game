@@ -22,8 +22,8 @@
 (defn update-state
   [state]
   (-> state
-      (update :ringmaster #(r/update-ringmaster % state))
-      (update :fleas #(f/update-all % (:ringmaster state)))
+      (f/update-all)
+      (r/update-state)
       (assoc :level-score (get-score state))))
 
 (defn draw
@@ -47,7 +47,7 @@
 (defn key-pressed
   [state e]
   (if (= 10 (:key-code e)) ;; enter
-    (do (music/switch-track :title)
+    (do (when (:use-sound state) (music/switch-track :title))
         (-> state
             (assoc :screen :menu)
             (assoc :game-running true)
@@ -65,7 +65,14 @@
 
 (defn mouse-pressed
   [state e]
-  state)
+  (music/play-sound-effect :whip-1)
+  (if (not= :whipping (get-in state [:ringmaster :status]))
+    (-> state
+        (assoc-in [:ringmaster :status] :whipping)
+        (assoc-in [:ringmaster :whip-target] {:x (q/mouse-x)
+                                              :y (q/mouse-y)})
+        (update-in [:ringmaster :cracks] #(conj % (r/->crack (q/mouse-x) (q/mouse-y)))))
+    state))
 
 (defn mouse-released
   [state e]

@@ -1,4 +1,5 @@
 (ns flea-game.core
+  (:gen-class)
   (:require [flea-game.flea :as f]
             [flea-game.music :as music]
             [flea-game.ringmaster :as r]
@@ -6,23 +7,25 @@
             [flea-game.screens.level-2 :as level-2]
             [flea-game.screens.menu :as menu]
             [quil.core :as q]
-            [quil.middleware :as m])
-  (:gen-class))
+            [quil.middleware :as m]))
 
 (def flea-count 1000)
 (def width 900)
 (def height 600)
+(def use-sound true)
 
 (defn setup []
   (q/frame-rate 60)
-  (music/init)
+  (when use-sound
+    (music/init))
   {:fleas        (take flea-count (repeatedly #(f/->flea width height)))
    :ringmaster   (r/->ringmaster)
    :held-keys    {}
    :game-running false
    :screen       :menu
    :screen-size  {:w width
-                  :h height}})
+                  :h height}
+   :use-sound    use-sound})
 
 (defn screen-update-state [state]
   (case (:screen state)

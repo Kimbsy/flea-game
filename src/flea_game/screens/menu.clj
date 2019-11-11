@@ -5,7 +5,8 @@
 
 (defn play-game
   [state]
-  (music/switch-track :level-1)
+  (when (:use-sound state)
+    (music/switch-track :level-1))
   (-> state
         (assoc :screen :level-1)))
 
@@ -103,7 +104,6 @@
 
 (defn key-pressed
   [state e]
-  (music/play-sound-effect :whip-1)
   state)
 
 (defn key-released

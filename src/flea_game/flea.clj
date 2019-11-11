@@ -14,7 +14,7 @@
            {:tx (u/random-target-offset (:x pos))
             :ty (u/random-target-offset (:y pos))}
            {:dj 0
-            :tj (u/random-jump-time)})))
+            :tj (rand-int 150)})))
 
 (defn draw-flea
   [{:keys [x y]}]
@@ -25,28 +25,19 @@
   {:x (- (:x f) (:x r))
    :y (- (:y f) (:y r))})
 
-(defn danger-close
-  [f r]
-  (and (> 70 (Math/abs (- (:x f) (:x r))))
-       (> 70 (Math/abs (- (:y f) (:y r))))))
-
 (defn calc-jump-coords
-  "The mouse is close, jump away!"
-  [f r]
-  (let [v-flee     (flee-vector f r)
+  [f d]
+  (let [v-flee     (flee-vector f d)
         magnitude  (- (u/random-flee-distance) (u/length v-flee))
         normalized (u/normalize v-flee)]
     {:tx (+ (:x f) (* (:x normalized) magnitude))
      :ty (+ (:y f) (* (:y normalized) magnitude))}))
 
 (defn maybe-calc-jump-coords
-  "If we have finished our jump and are ready for a new one, check if
-  the mouse is too close and select a new target."
   [f r]
-  (if (and (= (:x f) (:px f))
-           (= (:y f) (:py f)))
+  (if (= :waiting (:status f))
     (merge f
-           (if (danger-close f r)
+           (if (u/danger-close f r)
              (calc-jump-coords f r)
              {:tx (u/random-target-offset (:x f))
               :ty (u/random-target-offset (:y f))}))
@@ -84,10 +75,11 @@
                    :py (:y f))))))
 
 (defn update-all
-  [fleas r]
-  (map (fn [f]
-         (-> f
-             (update-flea-status r)
-             (maybe-calc-jump-coords r)
-             update-pos))
-       fleas))
+  [{:keys [fleas ringmaster] :as state}]
+  (-> state
+      (assoc :fleas (map (fn [f]
+                           (-> f
+                               (update-flea-status ringmaster)
+                               (maybe-calc-jump-coords ringmaster)
+                               update-pos))
+                         fleas))))

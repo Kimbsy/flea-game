@@ -35,6 +35,11 @@
     {:x (* (/ 1 length) (:x vector))
      :y (* (/ 1 length) (:y vector))}))
 
+(defn danger-close
+  [f d]
+  (and (> 70 (Math/abs (int (- (:x f) (:x d)))))
+       (> 70 (Math/abs (int (- (:y f) (:y d)))))))
+
 (defn inside
   [pos bounds]
   (and (<= (:x bounds) (:x pos) (+ (:x bounds) (:w bounds)))
