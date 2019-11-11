@@ -17,7 +17,7 @@
 
 (defn random-target-offset
   [t]
-  (+ t (rand-int 50) -15))
+  (+ t (rand-int 50) -25))
 
 (defn random-flee-distance
   []
@@ -37,8 +37,8 @@
 
 (defn danger-close
   [f d]
-  (and (> 70 (Math/abs (int (- (:x f) (:x d)))))
-       (> 70 (Math/abs (int (- (:y f) (:y d)))))))
+  (and (> 60 (Math/abs (int (- (:x f) (:x d)))))
+       (> 60 (Math/abs (int (- (:y f) (:y d)))))))
 
 (defn inside
   [pos bounds]
