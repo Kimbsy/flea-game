@@ -1,11 +1,17 @@
-(ns flea-game.screens.level-1
+(ns flea-game.screens.level-4
   (:require [flea-game.flea :as f]
             [flea-game.music :as music]
             [flea-game.ringmaster :as r]
             [flea-game.utils :as u]
             [quil.core :as q]))
 
-(def required-score 800)
+(def required-score 200)
+
+(defn init
+  [{:keys [screen-size] :as state}]
+  (assoc state :fleas (take u/flea-count
+                            (repeatedly #(f/->flea (/ (:w screen-size) 2)
+                                                   (/ (:h screen-size) 2))))))
 
 (defn goal-bounds
   [{:keys [w h]}]
@@ -24,7 +30,7 @@
 (defn check-victory
   [state]
   (if (< required-score (:level-score state))
-    (assoc state :screen :victory-1)
+    (assoc state :screen :victory-4)
     state))
 
 (defn update-state

@@ -4,9 +4,9 @@
             [quil.core :as q]))
 
 (defn ->flea
-  [screen-width screen-height]
-  (let [pos {:x      (+ (/ screen-width 2) (rand-int 100) -50)
-             :y      (+ (/ screen-height 2) (rand-int 100) -50)
+  [x y]
+  (let [pos {:x      (+ x (rand-int 100) -50)
+             :y      (+ y (rand-int 100) -50)
              :status :waiting}]
     (merge pos
            (s/rename-keys pos {:x :px

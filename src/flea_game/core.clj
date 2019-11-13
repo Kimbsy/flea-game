@@ -5,68 +5,118 @@
             [flea-game.ringmaster :as r]
             [flea-game.screens.level-1 :as level-1]
             [flea-game.screens.level-2 :as level-2]
+            [flea-game.screens.level-3 :as level-3]
+            [flea-game.screens.level-4 :as level-4]
             [flea-game.screens.menu :as menu]
+            [flea-game.screens.victory-1 :as victory-1]
+            [flea-game.screens.victory-2 :as victory-2]
+            [flea-game.screens.victory-3 :as victory-3]
+            [flea-game.screens.victory-4 :as victory-4]
+            [flea-game.utils :as u]
             [quil.core :as q]
             [quil.middleware :as m]))
 
-(def flea-count 1000)
 (def width 900)
 (def height 600)
-(def use-sound true)
+(def use-sound false)
 
-(defn setup []
+(defn setup
+  []
   (q/frame-rate 60)
   (when use-sound
     (music/init))
-  {:fleas        (take flea-count (repeatedly #(f/->flea width height)))
-   :ringmaster   (r/->ringmaster)
-   :held-keys    {}
-   :game-running false
-   :screen       :menu
-   :screen-size  {:w width
-                  :h height}
-   :use-sound    use-sound})
+  {:fleas         (take u/flea-count (repeatedly #(f/->flea (/ width 2)
+                                                            (/ height 2))))
+   :ringmaster    (r/->ringmaster)
+   :held-keys     {}
+   :game-running  false
+   :screen        :menu
+   :current-level :level-1
+   :screen-size   {:w width
+                   :h height}
+   :use-sound     use-sound})
 
-(defn screen-update-state [state]
+(defn screen-update-state
+  [state]
   (case (:screen state)
-    :menu    (menu/update-state state)
-    :level-1 (level-1/update-state state)
-    :level-2 (level-2/update-state state)))
+    :menu      (menu/update-state state)
+    :level-1   (level-1/update-state state)
+    :level-2   (level-2/update-state state)
+    :level-3   (level-3/update-state state)
+    :level-4   (level-4/update-state state)
+    :victory-1 (victory-1/update-state state)
+    :victory-2 (victory-2/update-state state)
+    :victory-3 (victory-3/update-state state)
+    :victory-4 (victory-4/update-state state)))
 
 (defn screen-draw
   [state]
   (case (:screen state)
-    :menu    (menu/draw state)
-    :level-1 (level-1/draw state)
-    :level-2 (level-2/draw state)))
+    :menu      (menu/draw state)
+    :level-1   (level-1/draw state)
+    :level-2   (level-2/draw state)
+    :level-3   (level-3/draw state)
+    :level-4   (level-4/draw state)
+    :victory-1 (victory-1/draw state)
+    :victory-2 (victory-2/draw state)
+    :victory-3 (victory-3/draw state)
+    :victory-4 (victory-4/draw state)))
 
 (defn screen-key-pressed
   [state e]
+  ;; Preventing esc from closing the sketch by setting current key to 0.
+  (if (= 27 (q/key-code)) ;; escape
+    (set! (.key (quil.applet/current-applet)) (char 0)))
+
   (case (:screen state)
-    :menu    (menu/key-pressed state e)
-    :level-1 (level-1/key-pressed state e)
-    :level-2 (level-2/key-pressed state e)))
+    :menu      (menu/key-pressed state e)
+    :level-1   (level-1/key-pressed state e)
+    :level-2   (level-2/key-pressed state e)
+    :level-3   (level-3/key-pressed state e)
+    :level-4   (level-4/key-pressed state e)
+    :victory-1 (victory-1/key-pressed state e)
+    :victory-2 (victory-2/key-pressed state e)
+    :victory-3 (victory-3/key-pressed state e)
+    :victory-4 (victory-4/key-pressed state e)))
 
 (defn screen-key-released
   [state e]
   (case (:screen state)
-    :menu    (menu/key-released state e)
-    :level-1 (level-1/key-released state e)
-    :level-2 (level-2/key-released state e)))
+    :menu      (menu/key-released state e)
+    :level-1   (level-1/key-released state e)
+    :level-2   (level-2/key-released state e)
+    :level-3   (level-3/key-released state e)
+    :level-4   (level-4/key-released state e)
+    :victory-1 (victory-1/key-released state e)
+    :victory-2 (victory-2/key-released state e)
+    :victory-3 (victory-3/key-released state e)
+    :victory-4 (victory-4/key-released state e)))
 
 (defn screen-mouse-pressed
   [state e]
   (case (:screen state)
-    :menu    (menu/mouse-pressed state e)
-    :level-1 (level-1/mouse-pressed state e)
-    :level-2 (level-2/mouse-pressed state e)))
+    :menu      (menu/mouse-pressed state e)
+    :level-1   (level-1/mouse-pressed state e)
+    :level-2   (level-2/mouse-pressed state e)
+    :level-3   (level-3/mouse-pressed state e)
+    :level-4   (level-4/mouse-pressed state e)
+    :victory-1 (victory-1/mouse-pressed state e)
+    :victory-2 (victory-2/mouse-pressed state e)
+    :victory-3 (victory-3/mouse-pressed state e)
+    :victory-4 (victory-4/mouse-pressed state e)))
 
 (defn screen-mouse-released
   [state e]
   (case (:screen state)
-    :menu    (menu/mouse-released state e)
-    :level-1 (level-1/mouse-released state e)
-    :level-2 (level-2/mouse-released state e)))
+    :menu      (menu/mouse-released state e)
+    :level-1   (level-1/mouse-released state e)
+    :level-2   (level-2/mouse-released state e)
+    :level-3   (level-3/mouse-released state e)
+    :level-4   (level-4/mouse-released state e)
+    :victory-1 (victory-1/mouse-released state e)
+    :victory-2 (victory-2/mouse-released state e)
+    :victory-3 (victory-3/mouse-released state e)
+    :victory-4 (victory-4/mouse-released state e)))
 
 (defn -main
   [& args]

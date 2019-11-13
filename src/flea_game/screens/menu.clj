@@ -1,14 +1,15 @@
 (ns flea-game.screens.menu
-  (:require [flea-game.music :as music]
+  (:require [flea-game.button :as button]
+            [flea-game.music :as music]
             [flea-game.utils :as u]
             [quil.core :as q]))
 
 (defn play-game
   [state]
   (when (:use-sound state)
-    (music/switch-track :level-1))
+    (music/switch-track (:current-level state)))
   (-> state
-        (assoc :screen :level-1)))
+        (assoc :screen (:current-level state))))
 
 (defn options
   [state]
@@ -33,57 +34,6 @@
   [state]
   state)
 
-(defn button-get-x
-  [w]
-  (/ w 3))
-
-(defn button-get-y
-  [i h n]
-  (+ (* 2 (/ h 5)) (* i (/ (* 2 (/ h 3)) (inc n)))))
-
-(defn button-get-w
-  [w]
-  (/ w 3))
-
-(defn button-get-h
-  [h]
-  (/ h 10))
-
-(defn button-offset
-  [state i]
-  (if (= i (:held-button state))
-    3
-    0))
-
-(defn get-bounds
-  [i w h n]
-  {:x (button-get-x w)
-   :y (button-get-y i h n)
-   :w (button-get-w w)
-   :h (button-get-h h)})
-
-(defn draw-button
-  [{{:keys [w h]} :screen-size :as state} n i {:keys [text] :as b}]
-  (apply q/fill u/black)
-  (q/rect (+ 3 (button-get-x w))
-          (+ 3 (button-get-y i h n))
-          (button-get-w w)
-          (button-get-h h))
-
-  (apply q/fill u/dark-grey)
-  (q/rect (+ (button-get-x w)
-             (button-offset state i))
-          (+ (button-get-y i h n)
-             (button-offset state i))
-          (button-get-w w)
-          (button-get-h h))
-  (apply q/fill u/white)
-  (q/text text
-          (+ (/ w 2)
-             (button-offset state i))
-          (+ (+ (button-get-y i h n) (/ h 20))
-             (button-offset state i))))
-
 (defn draw
   [{{:keys [w h]} :screen-size :as state}]
   (let [buttons (if (:game-running state)
@@ -96,9 +46,9 @@
     (q/text-font (q/create-font "URW Chancery L Medium Italic" 50))
     (q/text "Working Title Flea Game" (/ w 2) (/ h 6))
 
-    (q/text-font (q/create-font  "Courier" 30))
+    (q/text-font (q/create-font "Courier" 30))
     (q/no-stroke)
-    (doall (map (partial draw-button state (count buttons))
+    (doall (map (partial button/draw-button state (count buttons))
                 (range)
                 buttons))))
 
@@ -115,7 +65,7 @@
   (let [n (count default-buttons)]
     (doall
      (reduce (fn [state [i b]]
-               (if (u/inside e (get-bounds i w h n))
+               (if (u/inside e (button/get-bounds i w h n))
                  (assoc state :held-button i)
                  state))
              state

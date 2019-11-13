@@ -1,5 +1,6 @@
 (ns flea-game.utils)
 
+(def flea-count 1000)
 (def black [0 0 0])
 (def white [255 255 255])
 (def red [255 0 0])
