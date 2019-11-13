@@ -13,6 +13,7 @@
                             (repeatedly #(f/->flea (/ (:w screen-size) 2)
                                                    (/ (:h screen-size) 2))))))
 
+;; @TODO this level needs to be hard
 (defn goal-bounds
   [{:keys [w h]}]
   {:x (* 5 (/ w 7))

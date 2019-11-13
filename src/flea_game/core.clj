@@ -18,7 +18,7 @@
 
 (def width 900)
 (def height 600)
-(def use-sound false)
+(def use-sound true)
 
 (defn setup
   []

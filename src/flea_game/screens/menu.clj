@@ -7,7 +7,7 @@
 (defn play-game
   [state]
   (when (:use-sound state)
-    (music/switch-track (:current-level state)))
+    (music/switch-track :level))
   (-> state
         (assoc :screen (:current-level state))))
 
