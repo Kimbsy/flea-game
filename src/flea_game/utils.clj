@@ -32,9 +32,11 @@
 (defn normalize
   "Normalize a vector to length 1."
   [vector]
-  (let [length (length vector)]
-    {:x (* (/ 1 length) (:x vector))
-     :y (* (/ 1 length) (:y vector))}))
+  (let [l (length vector)]
+    (if (= 0.0 l)
+      {:x 0.0 :y 0.0}
+      {:x (* (/ 1 l) (:x vector))
+       :y (* (/ 1 l) (:y vector))})))
 
 (defn danger-close
   [f d]
