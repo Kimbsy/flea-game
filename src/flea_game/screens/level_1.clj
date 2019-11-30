@@ -70,7 +70,9 @@
   (r/draw (:ringmaster state))
 
   (apply q/fill u/black)
-  (q/text (str (:level-score state)) 50 50)
+  (q/text-align :right :center)
+  (q/text (format "%d / %d" (:level-score state) required-score) 200 50)
+  (q/text-align :center :center)
 
   (when (:victory? state)
     (q/no-fill)

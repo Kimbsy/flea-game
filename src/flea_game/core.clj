@@ -44,8 +44,8 @@
    :ringmaster     (r/->ringmaster)
    :held-keys      {}
    :game-running   false
-   :screen         :menu
-   :current-level  :level-1
+   :screen         :victory-3
+   :current-level  :level-4
    :victory?       false
    :victory-timout 0
    :screen-size    {:w width

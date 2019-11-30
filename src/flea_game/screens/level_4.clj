@@ -13,13 +13,9 @@
   [(fire/->fire-wall (- (* 5 (/ w 7)) 10)
                      0
                      20
-                     (* 2 (/ h 5)))
-   (fire/->fire-wall (- (* 5 (/ w 7)) 10)
-                     (* 3 (/ h 5))
-                     20
-                     (* 2 (/ h 5)))
+                     (* 3 (/ h 5)))
    (fire/->fire-wall (* 4 (/ w 7))
-                     (* 1 (/ h 5))
+                     (* 2 (/ h 5))
                      20
                      (* 3 (/ h 5)))])
 
@@ -103,7 +99,12 @@
   (r/draw (:ringmaster state))
 
   (apply q/fill u/black)
-  (q/text (str (:level-score state)) 50 50)
+  (q/text-align :right :center)
+  (q/text (format "%d / %d"
+                  (:level-score state)
+                  (min required-score (- (count (:fleas state)) (:level-score state))))
+          200 50)
+  (q/text-align :center :center)
 
   (when (:victory? state)
     (q/no-fill)
