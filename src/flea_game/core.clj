@@ -50,7 +50,7 @@
    :use-sound     use-sound
    :images        (load-images)
    :fonts         (create-fonts)
-   :debug-mode    true})
+   :debug-mode    false})
 
 (defn screen-update-state
   [state]

@@ -24,6 +24,7 @@
    :direction     :up
    :whip-progress 1
    :whip-target   nil
+   :whip-timeout  0
    :status        :idle
    :cracks        []})
 
@@ -132,6 +133,11 @@
       (update :x #(+ % vx))
       (update :y #(+ % vy))))
 
+(defn update-whip-timeout
+  [{:keys [whip-timeout] :as r}]
+  (let [new-timeout (max 0 (dec whip-timeout))]
+    (assoc r :whip-timeout new-timeout)))
+
 (defn update-whip
   [{:keys [status whip-progress] :as r}]
   (case status
@@ -198,6 +204,7 @@
                                (update-velocity held-keys)
                                (apply-friction)
                                (update-pos)
+                               (update-whip-timeout)
                                (update-whip)
                                (update-cracks))
         whipped-fleas      (whip-fleas fleas updated-ringmaster)]

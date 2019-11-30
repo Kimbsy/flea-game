@@ -43,10 +43,10 @@
 
     (apply q/fill u/dark-grey)
     (q/text-align :center :center)
-    (q/text-font (q/create-font "URW Chancery L Medium Italic" 50))
+    (q/text-font (get-in state [:fonts :title]))
     (q/text "Working Title Flea Game" (/ w 2) (/ h 6))
 
-    (q/text-font (q/create-font "Courier" 30))
+    (q/text-font (get-in state [:fonts :button]))
     (q/no-stroke)
     (doall (map (partial button/draw-button state (count buttons))
                 (range)

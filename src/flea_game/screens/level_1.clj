@@ -77,9 +77,11 @@
 (defn mouse-pressed
   [state e]
   (music/play-sound-effect :whip-1)
-  (if (not= :whipping (get-in state [:ringmaster :status]))
+  (if (and (not= :whipping (get-in state [:ringmaster :status]))
+           (= 0 (get-in state [:ringmaster :whip-timeout])))
     (-> state
         (assoc-in [:ringmaster :status] :whipping)
+        (assoc-in [:ringmaster :whip-timeout] 50)
         (assoc-in [:ringmaster :whip-target] {:x (q/mouse-x)
                                               :y (q/mouse-y)})
         (update-in [:ringmaster :cracks] #(conj % (r/->crack (q/mouse-x) (q/mouse-y)))))
