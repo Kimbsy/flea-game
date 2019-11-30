@@ -46,7 +46,7 @@
   (if-not (:victory? state)
     (let [remaining-count (count (:fleas state))]
       (if (or (< required-score (:level-score state))
-              (<= (- remaining-count (:level-score state)) 50)
+              (<= (- remaining-count (:level-score state)) 100)
               (and (:debug-mode state)
                    (< 2 (:level-score state))))
         (-> state
