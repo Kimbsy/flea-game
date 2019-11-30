@@ -59,7 +59,8 @@
 
 
 (def tracks {:title "music/Lively Lumpsucker.mp3"
-             :level "music/Wagon Wheel.mp3"})
+             :level "music/Fig Leaf Times Two.mp3"
+             :final-level "music/Wagon Wheel.mp3"})
 
 (def sound-effects {:whip-1 "sound-effects/whip-crack-01.wav"})
 

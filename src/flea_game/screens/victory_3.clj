@@ -7,6 +7,8 @@
 
 (defn level-4
   [state]
+  (when (:use-sound state)
+    (music/switch-track :final-level))
   (-> state
       (assoc :screen :level-4
              :current-level :level-4)
