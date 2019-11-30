@@ -2,6 +2,14 @@
   (:require [flea-game.utils :as u]
             [quil.core :as q]))
 
+(defn button-get-w
+  [w]
+  (/ w 4))
+
+(defn button-get-h
+  [h]
+  (/ h 10))
+
 (defn button-get-y
   [w]
   (* 3 (/ w 5)))
@@ -10,14 +18,6 @@
   [i w n]
   (- (* (inc i) (/ w (inc n)))
      (/ (button-get-w w) 2)))
-
-(defn button-get-w
-  [w]
-  (/ w 4))
-
-(defn button-get-h
-  [h]
-  (/ h 10))
 
 (defn button-offset
   [state i]

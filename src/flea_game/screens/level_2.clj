@@ -24,7 +24,7 @@
   [{:keys [fleas screen-size]}]
   (let [bounds (goal-bounds screen-size)]
     (->> fleas
-         (filter #(u/inside % bounds))
+         (filter #(u/inside? % bounds))
          count)))
 
 (defn check-victory

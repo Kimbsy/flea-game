@@ -47,7 +47,7 @@
   (let [n (count buttons)]
     (doall
      (reduce (fn [state [i b]]
-               (if (u/inside e (button/get-bounds i w h n))
+               (if (u/inside? e (button/get-bounds i w h n))
                  (assoc state :held-button i)
                  state))
              state

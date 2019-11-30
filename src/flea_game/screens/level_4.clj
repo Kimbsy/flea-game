@@ -1,19 +1,32 @@
 (ns flea-game.screens.level-4
-  (:require [flea-game.flea :as f]
+  (:require [flea-game.fire :as fire]
+            [flea-game.flea :as f]
             [flea-game.music :as music]
             [flea-game.ringmaster :as r]
             [flea-game.utils :as u]
             [quil.core :as q]))
 
-(def required-score 200)
+(def required-score 500)
+
+(defn create-fire-walls
+  [{:keys [w h]}]
+  [(fire/->fire-wall (- (* 5 (/ w 7)) 10)
+                     0
+                     20
+                     (/ h 3))
+   (fire/->fire-wall (- (* 5 (/ w 7)) 10)
+                     (* 2 (/ h 3))
+                     20
+                     (/ h 3))])
 
 (defn init
   [{:keys [screen-size] :as state}]
-  (assoc state :fleas (take u/flea-count
-                            (repeatedly #(f/->flea (/ (:w screen-size) 2)
-                                                   (/ (:h screen-size) 2))))))
+  (-> state
+      (assoc :fleas (take u/flea-count
+                          (repeatedly #(f/->flea (/ (:w screen-size) 2)
+                                                 (/ (:h screen-size) 2)))))
+      (assoc :fire-walls (create-fire-walls screen-size))))
 
-;; @TODO this level needs to be hard
 (defn goal-bounds
   [{:keys [w h]}]
   {:x (* 5 (/ w 7))
@@ -25,22 +38,25 @@
   [{:keys [fleas screen-size]}]
   (let [bounds (goal-bounds screen-size)]
     (->> fleas
-         (filter #(u/inside % bounds))
+         (filter #(u/inside? % bounds))
          count)))
 
 (defn check-victory
   [state]
-  (if (or (< required-score (:level-score state))
-          (and (:debug-mode state)
-               (< 2 (:level-score state))))
-    (assoc state :screen :victory-4)
-    state))
+  (let [remaining-count (count (:fleas state))]
+    (if (or (< required-score (:level-score state))
+            (<= (- remaining-count (:level-score state)) 50)
+            (and (:debug-mode state)
+                 (< 2 (:level-score state))))
+      (assoc state :screen :victory-4)
+      state)))
 
 (defn update-state
   [state]
   (-> state
       (f/update-all)
       (r/update-state)
+      (fire/kill-fleas)
       (assoc :level-score (get-score state))
       (check-victory)))
 
@@ -56,6 +72,8 @@
   (apply q/stroke u/black)
   (q/stroke-weight 2)
   (doall (map f/draw-flea (:fleas state)))
+
+  (doall (map fire/draw-fire-wall (:fire-walls state)))
 
   (r/draw (:ringmaster state))
 

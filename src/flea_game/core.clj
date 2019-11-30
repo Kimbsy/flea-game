@@ -43,8 +43,8 @@
    :ringmaster    (r/->ringmaster)
    :held-keys     {}
    :game-running  false
-   :screen        :menu
-   :current-level :level-1
+   :screen        :victory-3
+   :current-level :level-3
    :screen-size   {:w width
                    :h height}
    :use-sound     use-sound

@@ -20,14 +20,14 @@
   (music/stop)
   (q/exit))
 
-(def default-buttons [{:text        "START"
-                       :handler     play-game
-                       :is-pressed? false}
-#_                      {:text        "OPTIONS"
-                       :handler     options
-                       :is-pressed? false}
+(def default-buttons [#_{:text        "OPTIONS"
+                         :handler     options
+                         :is-pressed? false}
                       {:text        "EXIT"
                        :handler     exit
+                       :is-pressed? false}
+                      {:text        "START"
+                       :handler     play-game
                        :is-pressed? false}])
 
 (defn update-state
@@ -65,7 +65,7 @@
   (let [n (count default-buttons)]
     (doall
      (reduce (fn [state [i b]]
-               (if (u/inside e (button/get-bounds i w h n))
+               (if (u/inside? e (button/get-bounds i w h n))
                  (assoc state :held-button i)
                  state))
              state

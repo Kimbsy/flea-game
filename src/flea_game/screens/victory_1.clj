@@ -17,11 +17,11 @@
   (music/stop)
   (q/exit))
 
-(def buttons [{:text        "NEXT"
-               :handler     level-2
-               :is-pressed? false}
-              {:text        "EXIT"
+(def buttons [{:text        "EXIT"
                :handler     exit
+               :is-pressed? false}
+              {:text        "NEXT"
+               :handler     level-2
                :is-pressed? false}])
 
 (defn update-state
@@ -58,7 +58,7 @@
   (let [n (count buttons)]
     (doall
      (reduce (fn [state [i b]]
-               (if (u/inside e (button/get-bounds i w h n))
+               (if (u/inside? e (button/get-bounds i w h n))
                  (assoc state :held-button i)
                  state))
              state

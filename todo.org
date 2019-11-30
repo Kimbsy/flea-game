@@ -1,10 +1,14 @@
 * flea-game
 ** DONE add text to victory screens
-** TODO move buttons around?
+** DONE move buttons around?
 *** should just make them horizontal instead?
-** TODO create preamble screens
-** TODO finish last level
+** DONE flip next and quit order
+** DONE finish last level
+*** DONE wall of fire?
+*** DONE finish at 500 or when most fleas safe or dead
 ** TODO time whole game as score?
+*** maybe total time in levels as well as survivor count from last level?
+** TODO create preamble screens
 ** TODO add winning animation to stop clicking through victory screen?
 ** TODO add whip timeout?
 ** TODO don't use whip in first level?

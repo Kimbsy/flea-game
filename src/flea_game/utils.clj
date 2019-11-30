@@ -4,6 +4,7 @@
 (def black [0 0 0])
 (def white [255 255 255])
 (def red [255 0 0])
+(def orange [255 100 0])
 (def light-grey [200 200 200])
 (def dark-grey [100 100 100])
 
@@ -43,7 +44,7 @@
   (and (> 60 (Math/abs (int (- (:x f) (:x d)))))
        (> 60 (Math/abs (int (- (:y f) (:y d)))))))
 
-(defn inside
+(defn inside?
   [pos bounds]
   (and (<= (:x bounds) (:x pos) (+ (:x bounds) (:w bounds)))
        (<= (:y bounds) (:y pos) (+ (:y bounds) (:h bounds)))))
