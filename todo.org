@@ -11,9 +11,9 @@
 ** DONE add whip timeout?
 ** DONE don't use whip in first level?
 ** DONE add winning animation to stop clicking through victory screen?
-** TODO add target scores on overlay
-** TODO create preamble screens?
-** TODO rename game
+** DONE add target scores on overlay
+** DONE rename game
+*** Professor fantastico's marvelous feats of flea herding
 ** TODO remove debug flag
 ** TODO submit game
 ** 
