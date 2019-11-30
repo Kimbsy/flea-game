@@ -23,27 +23,44 @@
 
 (defn check-victory
   [state]
-  (if (or (< required-score (:level-score state))
-          (and (:debug-mode state)
-               (< 2 (:level-score state))))
-    (assoc state :screen :victory-1)
+  (if-not (:victory? state)
+    (if (or (< required-score (:level-score state))
+            (and (:debug-mode state)
+                 (< 2 (:level-score state))))
+      (-> state
+          (assoc :victory? true)
+          (assoc :victory-timeout 50))
+      state)
     state))
+
+(defn advance
+  [state]
+  (-> state
+      (assoc :screen :victory-1)
+      (assoc :victory? false)
+      (assoc-in [:ringmaster :whip-timeout] 50)
+      (assoc :held-keys {})))
 
 (defn update-state
   [state]
-  (-> state
-      (f/update-all)
-      (r/update-state)
-      (assoc :level-score (get-score state))
-      (check-victory)))
+  (let [updated-state (-> state
+                          (f/update-all)
+                          (r/update-state)
+                          (assoc :level-score (get-score state))
+                          (check-victory))]
+    (if (:victory? updated-state)
+      (if (< 0 (:victory-timeout updated-state))
+        (update updated-state :victory-timeout dec)
+        (advance updated-state))
+      updated-state)))
 
 (defn draw
-  [state]
+  [{:keys [screen-size] :as state}]
   (q/background 230)
 
-  (apply q/fill u/light-grey)
-  (q/no-stroke)
-  (let [{:keys [x y w h]} (goal-bounds (:screen-size state))]
+  (let [{:keys [x y w h]} (goal-bounds screen-size)]
+    (apply q/fill u/light-grey)
+    (q/no-stroke)
     (q/rect x y w h))
 
   (apply q/stroke u/black)
@@ -53,7 +70,14 @@
   (r/draw (:ringmaster state))
 
   (apply q/fill u/black)
-  (q/text (str (:level-score state)) 50 50))
+  (q/text (str (:level-score state)) 50 50)
+
+  (when (:victory? state)
+    (q/no-fill)
+    (apply q/stroke u/green)
+    (q/stroke-weight 4)
+    (q/rect 0 0 (- (:w screen-size) 2) (- (:h screen-size) 2))
+    (q/stroke-weight 2)))
 
 (defn key-pressed
   [state e]

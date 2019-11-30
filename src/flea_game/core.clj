@@ -39,20 +39,22 @@
 
   (load-images)
 
-  {:fleas         (take u/flea-count (repeatedly #(f/->flea (/ width 2)
-                                                            (/ height 2))))
-   :ringmaster    (r/->ringmaster)
-   :held-keys     {}
-   :game-running  false
-   :screen        :menu
-   :current-level :level-1
-   :screen-size   {:w width
-                   :h height}
-   :use-sound     use-sound
-   :images        (load-images)
-   :fonts         (create-fonts)
-   :start-millis  (System/currentTimeMillis)
-   :debug-mode    false})
+  {:fleas          (take u/flea-count (repeatedly #(f/->flea (/ width 2)
+                                                             (/ height 2))))
+   :ringmaster     (r/->ringmaster)
+   :held-keys      {}
+   :game-running   false
+   :screen         :menu
+   :current-level  :level-1
+   :victory?       false
+   :victory-timout 0
+   :screen-size    {:w width
+                    :h height}
+   :use-sound      use-sound
+   :images         (load-images)
+   :fonts          (create-fonts)
+   :start-millis   (System/currentTimeMillis)
+   :debug-mode     true})
 
 (defn screen-update-state
   [state]
