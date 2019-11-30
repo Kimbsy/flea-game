@@ -23,7 +23,7 @@
 (def default-buttons [{:text        "START"
                        :handler     play-game
                        :is-pressed? false}
-                      {:text        "OPTIONS"
+#_                      {:text        "OPTIONS"
                        :handler     options
                        :is-pressed? false}
                       {:text        "EXIT"

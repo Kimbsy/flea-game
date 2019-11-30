@@ -1,0 +1,11 @@
+* flea-game
+** TODO add text to victory screens
+** TODO move buttons around?
+*** should just make them horizontal instead?
+** TODO create preamble screens
+** TODO finish last level
+** TODO time whole game as score?
+** TODO remove debug flag
+** TODO rename game
+** TODO submit game
+** 

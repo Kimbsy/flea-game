@@ -19,13 +19,20 @@
 
 (defn draw
   [state]
-  (q/background 0)
-  (q/text-align :center :center)
-  (q/text-font (q/create-font "Courier" 30))
-  (q/no-stroke)
-  (doall (map (partial button/draw-button state (count buttons))
-              (range)
-              buttons)))
+  (let [w (get-in state [:screen-size :w])
+        h (get-in state [:screen-size :h])]
+    (q/background 0)
+    (q/image (get-in state [:images :title-card]) 0 0 w h)
+    (q/text-align :center :center)
+    (q/text-font (get-in state [:fonts :title]))
+    (q/text "Amazing! Incredible! Astounding!" (/ w 2) (/ h 5))
+    (q/text-font (get-in state [:fonts :description]))
+    (q/text "What an incredible show! People will be talking about this night for years to come." (/ w 2) (/ h 3))
+    (q/text-font (get-in state [:fonts :button]))
+    (q/no-stroke)
+    (doall (map (partial button/draw-button state (count buttons))
+                (range)
+                buttons))))
 
 (defn key-pressed
   [state e]

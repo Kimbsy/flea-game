@@ -20,11 +20,24 @@
 (def height 600)
 (def use-sound true)
 
+(defn load-images
+  []
+  {:title-card (q/load-image "images/title-card-trimmed.png")})
+
+(defn create-fonts
+  []
+  {:title       (q/create-font "URW Chancery L Medium Italic" 50)
+   :description (q/create-font "URW Chancery L Medium Italic" 25)
+   :button      (q/create-font "Courier" 30)})
+
 (defn setup
   []
   (q/frame-rate 60)
   (when use-sound
     (music/init))
+
+  (load-images)
+
   {:fleas         (take u/flea-count (repeatedly #(f/->flea (/ width 2)
                                                             (/ height 2))))
    :ringmaster    (r/->ringmaster)
@@ -34,7 +47,10 @@
    :current-level :level-1
    :screen-size   {:w width
                    :h height}
-   :use-sound     use-sound})
+   :use-sound     use-sound
+   :images        (load-images)
+   :fonts         (create-fonts)
+   :debug-mode    true})
 
 (defn screen-update-state
   [state]

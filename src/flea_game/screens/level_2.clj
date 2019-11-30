@@ -29,7 +29,9 @@
 
 (defn check-victory
   [state]
-  (if (< required-score (:level-score state))
+  (if (or (< required-score (:level-score state))
+          (and (:debug-mode state)
+               (< 2 (:level-score state))))
     (assoc state :screen :victory-2)
     state))
 
