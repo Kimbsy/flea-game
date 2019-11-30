@@ -138,6 +138,11 @@
     :victory-3 (victory-3/mouse-released state e)
     :victory-4 (victory-4/mouse-released state e)))
 
+(defn full-exit
+  [state]
+  (music/stop)
+  (System/exit 0))
+
 (defn -main
   [& args]
   (q/sketch
@@ -150,4 +155,5 @@
    :key-released screen-key-released
    :mouse-pressed screen-mouse-pressed
    :mouse-released screen-mouse-released
+   :on-close full-exit
    :middleware [m/fun-mode]))
