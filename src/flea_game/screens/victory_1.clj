@@ -10,6 +10,7 @@
   (-> state
       (assoc :screen :level-2
              :current-level :level-2)
+      (assoc-in [:ringmaster :whip-enabled?] true)
       level-2/init))
 
 (defn exit

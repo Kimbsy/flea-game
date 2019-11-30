@@ -25,6 +25,7 @@
    :whip-progress 1
    :whip-target   nil
    :whip-timeout  0
+   :whip-enabled? false
    :status        :idle
    :cracks        []})
 
@@ -110,8 +111,9 @@
 (defn draw
   [{:keys [direction] :as r}]
   ((direction-map direction) r)
-  (draw-whip r)
-  (draw-cracks r))
+  (when (:whip-enabled? r)
+    (draw-whip r)
+    (draw-cracks r)))
 
 (defn update-velocity
   [r {:keys [w a s d]}]
@@ -199,15 +201,18 @@
 
 (defn update-state
   [{:keys [ringmaster held-keys] :as state}]
-  (let [fleas              (:fleas state)
-        updated-ringmaster (-> ringmaster
-                               (update-velocity held-keys)
-                               (apply-friction)
-                               (update-pos)
-                               (update-whip-timeout)
-                               (update-whip)
-                               (update-cracks))
-        whipped-fleas      (whip-fleas fleas updated-ringmaster)]
+  (let [fleas                   (:fleas state)
+        updated-ringmaster      (-> ringmaster
+                                    (update-velocity held-keys)
+                                    apply-friction
+                                    update-pos)
+        updated-whip-ringmaster (if (:whip-enabled? ringmaster)
+                                  (-> updated-ringmaster
+                                      update-whip-timeout
+                                      update-whip
+                                      update-cracks)
+                                  updated-ringmaster)
+        whipped-fleas           (whip-fleas fleas updated-whip-ringmaster)]
     (-> state
-        (assoc :ringmaster updated-ringmaster)
+        (assoc :ringmaster updated-whip-ringmaster)
         (assoc :fleas whipped-fleas))))

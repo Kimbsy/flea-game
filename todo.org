@@ -9,9 +9,9 @@
 ** DONE time whole game as score?
 *** maybe total time in levels as well as survivor count from last level?
 ** DONE add whip timeout?
-** TODO create preamble screens
+** DONE don't use whip in first level?
 ** TODO add winning animation to stop clicking through victory screen?
-** TODO don't use whip in first level?
+** TODO create preamble screens?
 ** TODO rename game
 ** TODO remove debug flag
 ** TODO submit game
