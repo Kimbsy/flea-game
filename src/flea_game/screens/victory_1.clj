@@ -40,6 +40,7 @@
     (q/text "Congratulations!" (/ w 2) (/ h 5))
     (q/text-font (get-in state [:fonts :description]))
     (q/text "The crowd's warmed up now, time to put on a show!" (/ w 2) (/ h 3))
+    (q/text "(Don't forget to use your whip!)" (/ w 2) (* 3 (/ h 7)))
     (q/text-font (get-in state [:fonts :button]))
     (q/no-stroke)
     (doall (map (partial button/draw-button state (count buttons))
