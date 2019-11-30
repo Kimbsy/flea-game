@@ -6,11 +6,11 @@
 ** DONE finish last level
 *** DONE wall of fire?
 *** DONE finish at 500 or when most fleas safe or dead
-** TODO time whole game as score?
+** DONE time whole game as score?
 *** maybe total time in levels as well as survivor count from last level?
+** DONE add whip timeout?
 ** TODO create preamble screens
 ** TODO add winning animation to stop clicking through victory screen?
-** DONE add whip timeout?
 ** TODO don't use whip in first level?
 ** TODO rename game
 ** TODO remove debug flag

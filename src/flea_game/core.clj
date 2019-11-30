@@ -28,7 +28,8 @@
   []
   {:title       (q/create-font "URW Chancery L Medium Italic" 50)
    :description (q/create-font "URW Chancery L Medium Italic" 25)
-   :button      (q/create-font "Courier" 30)})
+   :button      (q/create-font "Courier" 30)
+   :score       (q/create-font "Courier" 25)})
 
 (defn setup
   []
@@ -50,6 +51,7 @@
    :use-sound     use-sound
    :images        (load-images)
    :fonts         (create-fonts)
+   :start-millis  (System/currentTimeMillis)
    :debug-mode    false})
 
 (defn screen-update-state

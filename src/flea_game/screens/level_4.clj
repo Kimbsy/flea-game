@@ -6,24 +6,28 @@
             [flea-game.utils :as u]
             [quil.core :as q]))
 
-(def required-score 500)
+(def required-score 700)
 
 (defn create-fire-walls
   [{:keys [w h]}]
   [(fire/->fire-wall (- (* 5 (/ w 7)) 10)
                      0
                      20
-                     (/ h 3))
+                     (* 2 (/ h 5)))
    (fire/->fire-wall (- (* 5 (/ w 7)) 10)
-                     (* 2 (/ h 3))
+                     (* 3 (/ h 5))
                      20
-                     (/ h 3))])
+                     (* 2 (/ h 5)))
+   (fire/->fire-wall (* 4 (/ w 7))
+                     (* 1 (/ h 5))
+                     20
+                     (* 3 (/ h 5)))])
 
 (defn init
   [{:keys [screen-size] :as state}]
   (-> state
       (assoc :fleas (take u/flea-count
-                          (repeatedly #(f/->flea (/ (:w screen-size) 2)
+                          (repeatedly #(f/->flea (/ (:w screen-size) 4)
                                                  (/ (:h screen-size) 2)))))
       (assoc :fire-walls (create-fire-walls screen-size))))
 
@@ -48,7 +52,12 @@
             (<= (- remaining-count (:level-score state)) 50)
             (and (:debug-mode state)
                  (< 2 (:level-score state))))
-      (assoc state :screen :victory-4)
+      (-> state
+          (assoc :screen :victory-4)
+          (assoc :final-time (-> (System/currentTimeMillis)
+                                 (-  (:start-millis state))
+                                 (/ 1000)
+                                 int)))
       state)))
 
 (defn update-state

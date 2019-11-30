@@ -20,10 +20,7 @@
   (music/stop)
   (q/exit))
 
-(def default-buttons [#_{:text        "OPTIONS"
-                         :handler     options
-                         :is-pressed? false}
-                      {:text        "EXIT"
+(def default-buttons [{:text        "EXIT"
                        :handler     exit
                        :is-pressed? false}
                       {:text        "START"
@@ -37,15 +34,13 @@
 (defn draw
   [{{:keys [w h]} :screen-size :as state}]
   (let [buttons (if (:game-running state)
-                  (assoc-in default-buttons [0 :text] "CONTINUE")
+                  (assoc-in default-buttons [1 :text] "CONTINUE")
                   default-buttons)]
     (q/background 230)
-
     (apply q/fill u/dark-grey)
     (q/text-align :center :center)
     (q/text-font (get-in state [:fonts :title]))
     (q/text "Working Title Flea Game" (/ w 2) (/ h 6))
-
     (q/text-font (get-in state [:fonts :button]))
     (q/no-stroke)
     (doall (map (partial button/draw-button state (count buttons))
